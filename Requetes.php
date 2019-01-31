@@ -81,7 +81,7 @@
             'SELECT DISTINCT Enseignant, ActID as Activite FROM Repartition rep INNER JOIN Classes cl ON cl.ClasID=rep.ClasID WHERE cl.ClasID=(SELECT reps.ClasID FROM Repartition reps WHERE reps.ActID = rep.ActID GROUP BY reps.ClasID ORDER BY Count(*) DESC LIMIT 1);',
             'SELECT el.Nom FROM Repartition rep INNER JOIN Activites act ON act.ActID=rep.ActID INNER JOIN Eleve el ON el.ElevID=rep.ElevID GROUP BY rep.ElevID HAVING COUNT(*)>1;',
             'SELECT el.Nom FROM Repartition rep INNER JOIN Activites act ON act.ActID=rep.ActID INNER JOIN Eleve el ON el.ElevID=rep.ElevID GROUP BY rep.ElevID HAVING COUNT(*)=(SELECT COUNT(DISTINCT jour) as nombre FROM Activites);',
-            'SELECT el.Nom FROM Repartition rep INNER JOIN Activites act ON act.ActID=rep.ActID INNER JOIN Eleve el ON el.ElevID=rep.ElevID WHERE el.Ville=act.Lieu;',
+            'SELECT DISTINCT el.Nom FROM Repartition rep INNER JOIN Activites act ON act.ActID=rep.ActID INNER JOIN Eleve el ON el.ElevID=rep.ElevID WHERE el.Ville=act.Lieu;',
             'SELECT T1.activite AS Activite1,T2.activite AS Activite2 FROM (SELECT act.ActID as activite, COUNT(*) as nombre FROM Repartition rep INNER JOIN Activites act ON act.ActID=rep.ActID GROUP BY act.ActID) T1 JOIN (SELECT act.ActID as activite, COUNT(*) as nombre FROM Repartition rep INNER JOIN Activites act ON act.ActID=rep.ActID GROUP BY act.ActID) T2 WHERE T1.nombre=T2.nombre AND T1.activite!=T2.activite;',
             'SELECT act.ActID as Activite FROM Repartition rep INNER JOIN Activites act ON act.ActID=rep.ActID GROUP BY act.ActID ORDER BY COUNT(*) DESC;',
             'SELECT * FROM (SELECT cl.Enseignant as Nom, COUNT(*) AS num FROM Repartition rep INNER JOIN Classes cl ON cl.ClasID=rep.ClasID GROUP BY cl.ClasID) maTable WHERE maTable.num > (SELECT COUNT(cl.ClasID) FROM Repartition rep INNER JOIN Classes cl ON cl.ClasID=rep.ClasID)/(SELECT COUNT(ClasID) FROM Classes);',
@@ -90,7 +90,10 @@
             'SELECT rep.ActID as Activite,(SELECT els.Ville FROM Repartition reps INNER JOIN Classes cls ON cls.ClasID=reps.ClasID INNER JOIN Eleve els ON els.ElevID=reps.ElevID WHERE reps.ActID = Activite GROUP BY els.Ville ORDER BY COUNT(*) DESC LIMIT 1) as Ville FROM Repartition rep INNER JOIN Classes cl ON cl.ClasID=rep.ClasID INNER JOIN Eleve el ON el.ElevID=rep.ElevID GROUP BY rep.ActID;',
             'SELECT cl.Enseignant As Prof , el.Nom as Nom FROM Classes cl INNER JOIN Repartition rep ON rep.ClasID=cl.ClasID INNER JOIN Eleve el ON el.ElevID=rep.ElevID ;',
             'SELECT el.Nom,rep.ActID as Activite,act.jour as Jour FROM Repartition rep INNER JOIN Activites act ON act.ActID=rep.ActID INNER JOIN Eleve el ON el.ElevID=rep.ElevID WHERE el.Ville=act.Lieu;',
-            'SELECT DISTINCT jour as Jour, Bus FROM Activites;');
+            'SELECT DISTINCT jour as Jour, Bus FROM Activites;',
+            'SELECT DISTINCT el.Nom FROM Repartition rep INNER JOIN Activites act ON act.ActID=rep.ActID INNER JOIN Eleve el ON el.ElevID=rep.ElevID WHERE el.Ville!=act.Lieu;',
+            'SELECT Count(Distinct Bus) as "Nombre de bus necessaires" FROM Activites;',
+            'SELECT SUM(Age)/Count(Age) "Age moyen des eleves" FROM Eleve;');
         $texte = array( '1. La liste de tous les élèves triés en fonction de leur domicile.',
             '2. La liste des élèves par enseignant.',
             '3. Donner le nombre d’élèves par bus en fonction du jour.',
@@ -106,7 +109,10 @@
             '13. Donner pour chaque activité la(les) ville(s) où habite de la majorité des élèves.',
             '14. Pour chaque enseignant, donner la liste de ses élèves.',
             '15. On considère qu’un élève qui fait une activité dans sa ville ne prend pas le bus. Donner la liste des élèves qui ne prendrons pas le bus avec leur activité et le jour.',
-            '16. Donner les bus utilisés chaque jour.');
+            '16. Donner les bus utilisés chaque jour.',
+            '17. Donner les élèves qui n\'ont pas une activité dans leur ville de résidence.',
+            '18. Donner le nombre de bus nécessaires.',
+            '19. Donner l\'age moyen des élèves.');
 
         $conn->query('USE Eleves;')  or die($conn->error);
 
